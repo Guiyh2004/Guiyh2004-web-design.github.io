@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="课程项目静态演示：网格级活动量异动的证据链与规则判定。">
+<title>Grid Watch · 移动接入网活动量异动调查 Agent</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="banner">
+  <span class="banner-tag">STATIC DEMO</span>
+  <span>本页由 GitHub Pages 托管，数据与结论为后端离线导出的 5 个案例；实时调查需本地运行 FastAPI（见页末说明）。</span>
+</div>
+
+<div class="shell">
+  <header>
+    <div>
+      <div class="kicker">Incident Dossier · 移动接入网 · 网格级活动量调查</div>
+      <h1 id="h1">活动量骤降调查</h1>
+      <div class="sub" id="sub">MIL-2013-11-16 · SQUARE 7282 · 疑为小区退服或采集缺失</div>
+    </div>
+    <div class="docket">
+      案卷号 <b id="dno">MIL/7282/1116</b><br>
+      报告时刻 <b id="dtime">2013-11-16 21:40</b><br>
+      调查者 <b>Agent v0.1 · 台账模式</b>
+      <div class="tabs" id="tabs"></div>
+      <div id="mode" style="font-family:var(--mono);font-size:8.5px;letter-spacing:.12em;color:var(--ink-3);margin-top:6px"></div>
+    </div>
+  </header>
+
+  <div class="board">
+    <section class="col">
+      <div class="ch"><span>Hypotheses</span><span id="hcount">03</span></div>
+      <div id="hyps"></div>
+      <div class="ch" style="margin-top:18px"><span>判据 Probes</span><span id="pcount">0 / 3</span></div>
+      <div id="probes"></div>
+      <button class="btn" id="run">复核判据 · RULE ENGINE</button>
+    </section>
+
+    <section class="col">
+      <div class="ch"><span>Evidence Plates</span><span id="platecount">2</span></div>
+      <div class="plate">
+        <div class="ph"><span>01 · 时序 <b id="win">72h</b></span><span>单位：无量纲活动量</span></div>
+        <svg id="ts" viewBox="0 0 720 196" preserveAspectRatio="none"></svg>
+        <div class="tip" id="tip1"></div>
+        <div class="cap" id="cap1"></div>
+      </div>
+      <div class="plate">
+        <div class="ph"><span>02 · 空间对照 <b>邻域 k=8</b></span><span>同 10-min 窗口</span></div>
+        <svg id="hm" viewBox="0 0 720 186" preserveAspectRatio="none"></svg>
+        <div class="tip" id="tip2"></div>
+        <div class="cap" id="cap2"></div>
+      </div>
+    </section>
+
+    <section class="col">
+      <div class="ch"><span>Evidence Ledger</span><span id="ecount">E01–E05</span></div>
+      <div id="ledger"></div>
+
+      <div class="verdict" id="verdict">
+        <div class="lv">Rule Engine Verdict</div>
+        <div class="v" id="vtxt">待复核</div>
+        <div class="why" id="vwhy">点击左侧「复核判据」，由规则引擎按台账计算结论等级；语言模型不参与定级。</div>
+        <div class="stampbox" id="stamp">SUSPECTED</div>
+      </div>
+
+      <div class="ch" style="margin-top:16px"><span>Next Action</span><span>1</span></div>
+      <div class="next" id="next"></div>
+    </section>
+  </div>
+
+
+  <section class="about">
+    <div class="about-h"><span>About this page</span><span>静态托管能做什么 / 不能做什么</span></div>
+    <div class="about-grid">
+      <div class="about-card">
+        <div class="k">01 · 真实数据</div>
+        <p>五个案例取自 Telecom Italia 米兰网格活动量（ODbL 1.0），时刻与网格号可追溯到原始行；
+        曲线、邻域热力与台账数值均由后端脚本算出后导出，页面不做二次加工。</p>
+      </div>
+      <div class="about-card">
+        <div class="k">02 · 规则引擎</div>
+        <p>结论等级不是模型写的：三条判据（幅度 / 持续 / 空间局域）命中几条，就给对应等级；
+        点击「复核判据」看到的点亮顺序，就是引擎的计算顺序。</p>
+      </div>
+      <div class="about-card">
+        <div class="k">03 · 可回溯</div>
+        <p>每条证据可展开为工具原始返回（JSON），并带 <code>provenance</code>：文件、行号、时区、聚合粒度。
+        结论旁边写明降级理由，而不是只给一句话。</p>
+      </div>
+    </div>
+
+    <div class="about-split">
+      <div>
+        <div class="about-h"><span>What this page cannot do</span><span>静态托管的边界</span></div>
+        <ul class="about-list">
+          <li>不能运行 Python 后端：本页没有模型调用，也没有实时数据读取。</li>
+          <li>不能切换任意网格或时间：只能看已经导出的 5 个案例。</li>
+          <li>不能写 trace：运行记录保存在本地 <code>outputs/traces/</code>，不在浏览器里。</li>
+        </ul>
+      </div>
+      <div>
+        <div class="about-h"><span>How to run the real thing</span><span>三条命令</span></div>
+        <pre class="code"><code>pip install -r requirements.txt
+uvicorn backend.main:app --reload
+# open http://127.0.0.1:8000</code></pre>
+        <p class="muted">没有 <code>DEEPSEEK_API_KEY</code> 时后端自动进入 <code>mode=rule-only</code>，
+        通路完整、结论仍然可复算。</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>数据：Telecom Italia Big Data Challenge · ODbL 1.0 · 无量纲活动量，不换算为速率</span>
+    <span id="foot">demo · 数值由页面内脚本生成，可复算</span>
+  </footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
